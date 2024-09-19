@@ -3,7 +3,7 @@ version: '3.8'
 services:
   vprodb:
     build: 
-      context : ./Docker-files/db
+      context: ./Docker-files/db
     image: anirban2311/vprofiledb
     container_name: vprodb  
     ports:
@@ -12,33 +12,42 @@ services:
       - vprodbdata:/var/lib/mysql
     environment:
       - MYSQL_ROOT_PASSWORD=vprodbpass
-        MYSQL_DATABASE=accounts   
+      - MYSQL_DATABASE=accounts   
+  
   vprocache01:
     image: memcached
     ports:
       - "11211:11211"
+
   vpromq01:
     image: rabbitmq
     ports:
-      - "15672:15672"    
+      - "5672:5672"       # Exposing the AMQP port
+      - "15672:15672"
     environment:
       - RABBITMQ_DEFAULT_USER=guest
-        RABBITMQ_DEFAULT_PASS=guest
+      - RABBITMQ_DEFAULT_PASS=guest
+
   vproapp:
     build: 
-      context : ./Docker-files/app
+      context: ./Docker-files/app
     image: anirban2311/vprofile_app
-    container_name: vproapp  
+    container_name: vpro_app  
     ports:
       - "8080:8080"
     volumes:
       - vproappdata:/usr/local/tomcat/webapps
+    depends_on:
+      - vpromq01           # Ensures RabbitMQ is up before vproapp starts
+  
   vproweb:
     build: 
-      context : ./Docker-files/web
+      context: ./Docker-files/web
     image: anirban2311/vprofileweb
     container_name: vproweb  
     ports:
       - "80:80"
-       
-           
+
+volumes: 
+  vprodbdata: {}
+  vproappdata: {}

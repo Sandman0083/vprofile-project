@@ -1,6 +1,4 @@
-FROM ngnix
+FROM nginx
 
-
-RUN rm -rf /etc/ngnix/conf.d/default.conf
-
-COPY nginvproapp.conf /etc/ngnix/conf.d/nginvproapp.conf
+RUN rm -rf /etc/nginx/conf.d/default.conf
+COPY nginvproapp.conf /etc/nginx/conf.d/nginvproapp.conf
